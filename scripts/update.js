@@ -27,9 +27,6 @@ fs.readdir(directoryPath, function (err, files) {
 
             const dataArray = [JSON.parse(data)];
 
-            for (const item of dataArray) {
-                item.owner.email = item.owner.email.replace(/@/, " (at) ");
-            }
 
             combinedArray = combinedArray.concat(dataArray);
 
