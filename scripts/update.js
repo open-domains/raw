@@ -25,6 +25,8 @@ fs.readdir(directoryPath, function (err, files) {
         fs.readFile(filePath, "utf8", (err, data) => {
             if (err) throw err;
 
+            console.log(filePath);
+
             const dataArray = [JSON.parse(data)];
 
 
