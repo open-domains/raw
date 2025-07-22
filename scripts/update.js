@@ -3,19 +3,20 @@ const path = require("path");
 
 const directoryPath = path.join(__dirname, "../../domains");
 const outputIndexPath = path.join(__dirname, "raw/index.json");
-const countsDirectoryPath = path.join(__dirname, "raw/counts");
+const globalCountPath = path.join(__dirname, "raw/domains-badge.json");
 
 let combinedArray = [];
 
-// Ensure counts directory exists
-if (!fs.existsSync(countsDirectoryPath)) {
-    fs.mkdirSync(countsDirectoryPath, { recursive: true });
+// Ensure output directory exists
+const outputDir = path.join(__dirname, "raw");
+if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
 }
 
 fs.readdir(directoryPath, function (err, files) {
     if (err) throw err;
 
-    // Fix: Remove "reserved"
+    // Remove "reserved" from list
     files = files.filter((value) => value !== "reserved");
 
     let filesRead = 0;
@@ -32,35 +33,26 @@ fs.readdir(directoryPath, function (err, files) {
             const dataArray = [parsed];
             combinedArray = combinedArray.concat(dataArray);
 
-            // Generate Shields.io-compatible count badge
-            const count = Array.isArray(parsed)
-                ? parsed.length
-                : typeof parsed === "object"
-                ? Object.keys(parsed).length
-                : 1;
-
-            const badgeData = {
-                schemaVersion: 1,
-                label: file,
-                message: String(count),
-                color: "blue"
-            };
-
-            fs.writeFile(
-                path.join(countsDirectoryPath, `${file}.json`),
-                JSON.stringify(badgeData),
-                (err) => {
-                    if (err) throw err;
-                }
-            );
-
             filesRead++;
 
-            // When all files are processed, write index
             if (filesRead === files.length) {
+                // Write the combined index.json
                 fs.writeFile(outputIndexPath, JSON.stringify(combinedArray, null, 2), (err) => {
                     if (err) throw err;
-                    console.log("index.json and Shields.io badges generated successfully.");
+                });
+
+                // Create a single Shields.io badge for total count
+                const totalCount = files.length;
+                const badgeData = {
+                    schemaVersion: 1,
+                    label: "domains",
+                    message: String(totalCount),
+                    color: "blue"
+                };
+
+                fs.writeFile(globalCountPath, JSON.stringify(badgeData), (err) => {
+                    if (err) throw err;
+                    console.log("Generated index.json and domains-badge.json.");
                 });
             }
         });
