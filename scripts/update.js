@@ -17,7 +17,7 @@ fs.readdir(directoryPath, function (err, files) {
     if (err) throw err;
 
     // Remove "reserved" from list
-    files = files.filter((value) => value !== "reserved");
+    //files = files.filter((value) => value !== "reserved");
 
     let filesRead = 0;
 
